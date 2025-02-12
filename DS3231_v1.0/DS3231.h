@@ -38,10 +38,6 @@ typedef struct
     uint8_t Address;
 } DS3231_Handle_t;
 
-{
-
-} DS3231_Typedef;
-
 //Functions
 void DS3231_Init(DS3231_Handle_t *ds3231, I2C_HandleTypeDef *hi2c);
 void DS3231_SetTime(DS3231_Handle_t *ds3231, uint8_t sec, uint8_t min, uint8_t hour, uint8_t day, uint8_t date, uint8_t month, uint8_t year);
@@ -51,3 +47,4 @@ float DS3231_GetTemperature(DS3231_Handle_t *ds3231);
 
 
 #endif
+
