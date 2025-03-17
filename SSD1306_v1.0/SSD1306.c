@@ -58,5 +58,26 @@ void SSD1306_Init(void)
 
 void SSD1306_UpdateScreen(void)
 {
-    
+    //Set page address and column offset
+    /*F0llowing the datasheet description:
+    • Set the page start address of the target display location by command B0h to B7h.
+    • Set the lower start column address of pointer by command 00h~0Fh.
+    • Set the upper start column address of pointer by command 10h~1F.
+    */
+    //There are 8 pages, each page have 128 column -> 128 bytes
+    for(int i = 0; i < 8; i++)
+    {
+        SSD1306_SendCommand(0xB0 + i);
+        SSD1306_SendCommand(0x00);
+        SSD1306_SendCommand(0x10);
+
+
+        for(int j = 0; j < 128; i++)
+        {
+            SSD1306_SendData(SSD1306_Buffer[i * 128 + j]);
+        }
+    }
 }
+
+
+

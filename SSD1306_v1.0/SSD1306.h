@@ -4,8 +4,17 @@
 #include <stdio.h>
 
 #define SSD1306_ADR  0x3C<<1
+#define SSD1306_HEIGHT 64
+#define SSD1306_LENGHT 128
+
 
 uint8_t SSD1306_Buffer[128 * 64 / 8];
+
+// Enumeration for screen colors
+typedef enum {
+    Black = 0x00, // Black color, no pixel
+    White = 0x01  // Pixel is set. Color depends on OLED
+} SSD1306_COLOR;
 
 void SSD1306_SendCommand(uint8_t cmd);
 void SSD1306_WriteData(uint8_t data);
