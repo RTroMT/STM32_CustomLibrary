@@ -79,5 +79,25 @@ void SSD1306_UpdateScreen(void)
     }
 }
 
+void SSD1306_DrawPixel(uint8_t x, uint8_t y, uint8_t color)
+{
+    if(x > SSD1306_LENGHT || y > SSD1306_HEIGHT)
+    {
+        return;
+    }
+
+    if(color == White)
+    {
+        SSD1306_Buffer[x + 128 * (y / 8)] |= 1 << (y % 8);
+    }
+    else{
+        SSD1306_Buffer[x + 128 * (y / 8)] &= ~[1 << (y % 8)];
+    }
+}
+
+void SSD1306_Clear(void)
+{
+    
+}
 
 
