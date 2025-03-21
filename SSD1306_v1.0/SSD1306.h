@@ -1,14 +1,14 @@
-#ifndef SSD1306__H
-#define SSD1306__H
+#ifndef SSD1306_H
+#define SSD1306_H
 
 #include <stdio.h>
+#include <stdint.h>
 
-#define SSD1306_ADR  0x3C<<1
+#define SSD1306_ADDR  (0x3C << 1)
 #define SSD1306_HEIGHT 64
-#define SSD1306_LENGHT 128
+#define SSD1306_LENGTH 128
 
-
-uint8_t SSD1306_Buffer[128 * 64 / 8];
+extern uint8_t SSD1306_Buffer[128 * 64 / 8];
 
 // Enumeration for screen colors
 typedef enum {
@@ -23,6 +23,7 @@ void SSD1306_Init(void);
 
 void SSD1306_UpdateScreen(void);
 void SSD1306_DrawPixel(uint8_t x, uint8_t y, uint8_t color);
+void SSD1306_FillWhite(void);
 void SSD1306_Clear(void);
 
 #endif

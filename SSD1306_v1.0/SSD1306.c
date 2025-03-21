@@ -1,33 +1,37 @@
-#include "SSD1306.h"
+#include <SSD1306.h>
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_i2c.h"
+
+extern I2C_HandleTypeDef hi2c1;
+uint8_t SSD1306_Buffer[128 * 64 / 8] = {0};
 
 void SSD1306_SendCommand(uint8_t cmd)
 {
     uint8_t data[2] = {0x00, cmd};   //0x00 mean Co = 0 and D/C# = 0 follow by six 0's
-    HAL_I2C_Master_Transmit(&hi2c1, SSD1306_ADR, data, HAL_MAX_DELAY);
+    HAL_I2C_Master_Transmit(&hi2c1, SSD1306_ADDR, data, 2,  HAL_MAX_DELAY);
 }
 
-void SSD1306_SendData(uint8_t data)
+void SSD1306_WriteData(uint8_t data)
 {
-    uint8_t data[2] = {0x40, cmd};  //0x00 mean Co = 0 and D/C# = 1 follow by six 0's
-    HAL_I2C_Master_Transmit(&hi2c1, SSD1306_ADDR, data, HAL_MAX_DELAY);
+    uint8_t buffer[2] = {0x40, data};  //0x00 mean Co = 0 and D/C# = 1 follow by six 0's
+    HAL_I2C_Master_Transmit(&hi2c1, SSD1306_ADDR, buffer, 2, HAL_MAX_DELAY);
+
 }
 
 void SSD1306_Init(void)
 {
     //Detail software initialization can be found in datasheet page 64
-    SSD1306_WriteCommand(0xAE); // Display OFF
-    SSD1306_WriteCommand(0xD5); // Set display clock divide ratio/oscillator frequency
-    SSD1306_WriteCommand(0x80); // Default clock value
+    SSD1306_SendCommand(0xAE); // Display OFF
+    SSD1306_SendCommand(0xD5); // Set display clock divide ratio/oscillator frequency
+    SSD1306_SendCommand(0x80); // Default clock value
 
     //Set MUX ratio
-    SSD1306_WriteCommand(0xA8);
-    SSD1306_WriteCommand(0x3F); //Set ratio to 1/64
+    SSD1306_SendCommand(0xA8);
+    SSD1306_SendCommand(0x3F); //Set ratio to 1/64
 
     //Set display offset
-    SSD1306_WriteCommand(0xD3);
-    SSD1306_WriteCommand(0x00);
+    SSD1306_SendCommand(0xD3);
+    SSD1306_SendCommand(0x00);
 
     //Set display start line
     SSD1306_SendCommand(0x40);
@@ -43,7 +47,7 @@ void SSD1306_Init(void)
 
     //Set contrast control
     SSD1306_SendCommand(0x81);
-    SSD1306_SendCommand(0x7F); //Medium contrast - used in reset state
+    SSD1306_SendCommand(0xFF); //Medium contrast - used in reset state
 
     //Set display configuration
     SSD1306_SendCommand(0xA4); // Disable entire display On
@@ -72,16 +76,16 @@ void SSD1306_UpdateScreen(void)
         SSD1306_SendCommand(0x10);
 
 
-        for(int j = 0; j < 128; i++)
+        for(int j = 0; j < 128; j++)
         {
-            SSD1306_SendData(SSD1306_Buffer[i * 128 + j]);
+            SSD1306_WriteData(SSD1306_Buffer[i * 128 + j]);
         }
     }
 }
 
 void SSD1306_DrawPixel(uint8_t x, uint8_t y, uint8_t color)
 {
-    if(x > SSD1306_LENGHT || y > SSD1306_HEIGHT)
+    if(x >= SSD1306_LENGTH || y >= SSD1306_HEIGHT)
     {
         return;
     }
@@ -91,13 +95,20 @@ void SSD1306_DrawPixel(uint8_t x, uint8_t y, uint8_t color)
         SSD1306_Buffer[x + 128 * (y / 8)] |= 1 << (y % 8);
     }
     else{
-        SSD1306_Buffer[x + 128 * (y / 8)] &= ~[1 << (y % 8)];
+        SSD1306_Buffer[x + 128 * (y / 8)] &= ~(1 << (y % 8));
     }
+}
+
+void SSD1306_FillWhite(void)
+{
+    memset(SSD1306_Buffer, 0xFF, sizeof(SSD1306_Buffer));
+    SSD1306_UpdateScreen();
 }
 
 void SSD1306_Clear(void)
 {
-    
+    memset(SSD1306_Buffer, 0x00, sizeof(SSD1306_Buffer));
+    SSD1306_UpdateScreen();
 }
 
 
